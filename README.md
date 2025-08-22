@@ -1,0 +1,1 @@
+# AuraPartnerAI MVP - Contextual Intelligence
