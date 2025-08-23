@@ -1,16 +1,45 @@
 name: CI
 on:
+  push:
+    branches: [ main ]
   pull_request:
     branches: [ main ]
+
 jobs:
+  precommit:
+    name: precommit
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: { python-version: '3.x' }
+      - run: pip install pre-commit
+      - run: pre-commit run --all-files
+
   build-and-test:
+    name: build-and-test
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
-        with:
-          node-version: '20'
-      - run: npm ci
-        if: hashFiles('package-lock.json') != ''
-      - run: npm run lint --if-present
-      - run: npm test --if-present
+        with: { node-version: '20' }
+      - name: Detect and run Node projects (root/backend/frontend)
+        shell: bash
+        run: |
+          set -eo pipefail
+          FOUND=""
+          for d in "." "backend" "frontend"; do
+            if [ -f "$d/package.json" ]; then
+              echo "→ Found package.json in $d"
+              ( cd "$d"
+                npm ci || npm i
+                npm run lint --if-present
+                npm test --if-present
+                npm run build --if-present
+              )
+              FOUND="yes"
+            fi
+          done
+          if [ -z "$FOUND" ]; then
+            echo "No Node projects detected (no package.json in ., backend, frontend) — skipping job successfully."
+          fi
