@@ -1,4 +1,3 @@
-# .github/workflows/ci.yml
 name: CI
 on:
   push: { branches: [ main ] }
@@ -21,9 +20,9 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
-        with: { node-version: '20' }
-
-      # 👇 «умный» шаг: не падает, если нет package.json или скриптов
+        with:
+          node-version: '20'
+          cache: 'npm'
       - name: Detect and run Node projects (root/backend/frontend)
         shell: bash
         run: |
@@ -33,19 +32,15 @@ jobs:
             if [[ -f "$d/package.json" ]]; then
               echo "→ Found package.json in $d"
               (
-                # внутри проекта НЕ валимся на ошибках — только логируем
+                # не валимся на ошибках внутри подпроекта — только логируем
                 set +e
                 cd "$d"
-
                 echo "+ npm ci || npm i"
                 npm ci >/dev/null 2>&1 || npm i || true
-
                 echo "+ npm run lint --if-present"
                 npm run lint --if-present || true
-
                 echo "+ npm test --if-present"
                 npm test --if-present || true
-
                 echo "+ npm run build --if-present"
                 npm run build --if-present || true
               )
