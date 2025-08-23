@@ -1,0 +1,10 @@
+
+# Secrets
+*.asc
+*.key
+*.pem
+*.p12
+*.crt
+*.cer
+*.der
+*.pfx
