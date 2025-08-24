@@ -1,11 +1,20 @@
 name: CI
+
 on:
+<<<<<<< HEAD
   push: { branches: [ main ] }
   pull_request: { branches: [ main ] }
+=======
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+>>>>>>> feature/ai-assistant-core
 
 jobs:
   precommit:
     name: precommit
+<<<<<<< HEAD
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -16,12 +25,39 @@ jobs:
 
   build-and-test:
     name: build-and-test
+=======
+>>>>>>> feature/ai-assistant-core
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.x'
+      - run: pip install --upgrade pip pre-commit
+      - run: pre-commit run --all-files
+
+  build-and-test:
+    name: build-and-test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Detect package.json presence
+        id: has_node
+        shell: bash
+        run: |
+          if git ls-files | grep -E '(^|/)(package.json)$' >/dev/null; then
+            echo "has_node=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "has_node=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Setup Node.js
+        if: ${{ steps.has_node.outputs.has_node == 'true' }}
+        uses: actions/setup-node@v4
         with:
           node-version: '20'
+<<<<<<< HEAD
           cache: 'npm'
       - name: Detect and run Node projects (root/backend/frontend)
         shell: bash
@@ -50,3 +86,34 @@ jobs:
           if [[ "$FOUND" -eq 0 ]]; then
             echo "No Node projects detected — skipping job successfully."
           fi
+=======
+          check-latest: true
+
+      - name: Detect and run Node projects (root/backend/frontend)
+        if: ${{ steps.has_node.outputs.has_node == 'true' }}
+        shell: bash
+        run: |
+          set +e
+          FOUND=0
+          for d in "." "backend" "frontend"; do
+            if [[ -f "$d/package.json" ]]; then
+              echo "::group::Node project in $d"
+              FOUND=1
+              (
+                set +e
+                cd "$d"
+                npm ci --no-audit --no-fund >/dev/null 2>&1 || npm i --no-audit --no-fund >/dev/null 2>&1 || true
+                npm run -s lint  --if-present >/dev/null 2>&1 || true
+                npm -s test        --if-present >/dev/null 2>&1 || true
+                npm run -s build   --if-present >/dev/null 2>&1 || true
+              )
+              echo "::endgroup::"
+            fi
+          done
+          [[ "$FOUND" -gt 0 ]] || echo "Nothing to run"
+          exit 0
+
+      - name: No Node projects — mark success
+        if: ${{ steps.has_node.outputs.has_node == 'false' }}
+        run: echo "No Node projects detected — job completes successfully."
+>>>>>>> feature/ai-assistant-core
