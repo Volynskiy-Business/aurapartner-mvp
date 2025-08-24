@@ -1,1 +1,7 @@
+# Global ownership
 * @Volynskiy-Business
+
+# Critical files
+/.github/ @Volynskiy-Business
+/.pre-commit-config.yaml @Volynskiy-Business
+/SECURITY.md @Volynskiy-Business
