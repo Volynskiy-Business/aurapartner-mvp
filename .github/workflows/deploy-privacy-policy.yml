@@ -1,0 +1,37 @@
+name: Deploy privacy-policy to VPS
+
+on:
+  push:
+    branches: [ main ]
+    paths:
+      - 'privacy-policy/**'
+      - '.github/workflows/deploy-privacy-policy.yml'
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup SSH
+        uses: webfactory/ssh-agent@v0.9.0
+        with:
+          ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
+
+      - name: Add VPS to known hosts
+        run: |
+          mkdir -p ~/.ssh
+          ssh-keyscan -H ${{ secrets.VPS_HOST }} >> ~/.ssh/known_hosts
+
+      - name: Deploy privacy-policy
+        run: |
+          rsync -avz --delete \
+            --exclude='*.git*' \
+            --exclude='node_modules' \
+            --exclude='.DS_Store' \
+            privacy-policy/ ${{ secrets.VPS_USER }}@${{ secrets.VPS_HOST }}:/var/www/aurapartnerai/privacy-policy/
+
+      - name: Reload Nginx
+        run: |
+          ssh ${{ secrets.VPS_USER }}@${{ secrets.VPS_HOST }} "sudo nginx -t && sudo systemctl reload nginx"
