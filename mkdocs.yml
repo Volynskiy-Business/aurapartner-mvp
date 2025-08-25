@@ -1,18 +1,34 @@
 site_name: AuraPartnerAI Docs
-docs_dir: docs
+site_url: https://docs.aurapartnerai.com
+
 theme:
   name: material
   language: en
   features:
     - navigation.tabs
+    - navigation.sections
     - search.suggest
+    - content.code.copy
+    - content.tabs.link
+
+extra:
+  version:
+    provider: mike
+
 plugins:
   - search
-  - git-revision-date-localized
+  - git-revision-date-localized:
+      fallback_to_build_date: true
+# NOTE: do NOT list "mike" here; Material reads versions via extra.version.provider
+
 markdown_extensions:
   - admonition
+  - footnotes
+  - pymdownx.details
   - pymdownx.superfences
+  - pymdownx.tabbed
+
 nav:
-  - Home: docs/index.md
-  - Architecture: docs/architecture.md
-  - Changelog: docs/changelog.md
+  - Home: index.md
+  - Architecture: architecture.md
+  - Changelog: changelog.md
