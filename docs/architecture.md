@@ -6,4 +6,3 @@ Core stack:
 - Embeddings: **BGE-M3**
 - Frontend: modern Next/Vite app
 - Docs: **MkDocs Material** + **Mike** for versioning
-
