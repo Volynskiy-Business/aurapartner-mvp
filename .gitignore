@@ -8,3 +8,9 @@
 *.cer
 *.der
 *.pfx
+.venv/
+.mike/
+site/
+node_modules/
+dist/
+build/
