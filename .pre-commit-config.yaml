@@ -1,11 +1,21 @@
 repos:
   - repo: https://github.com/pre-commit/pre-commit-hooks
-    rev: v4.4.0
+    rev: v4.6.0
     hooks:
-      - id: end-of-file-fixer
       - id: trailing-whitespace
+      - id: end-of-file-fixer
       - id: check-yaml
       - id: check-json
-      - id: detect-private-key
-      - id: check-added-large-files
-        args: ['--maxkb=10240']
+      - id: check-merge-conflict
+      - id: mixed-line-ending
+        args: ['--fix=lf']
+
+exclude: |
+  (?x)^(
+    \.venv/.*|
+    site/.*|
+    node_modules/.*|
+    \.mike/.*|
+    dist/.*|
+    build/.*
+  )$

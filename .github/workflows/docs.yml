@@ -2,7 +2,7 @@ name: Docs (mike deploy)
 
 on:
   push:
-    branches: [ main ]
+    branches: [main-clean]
   workflow_dispatch:
 
 permissions:
