@@ -13,6 +13,6 @@ markdown_extensions:
   - admonition
   - pymdownx.superfences
 nav:
-  - Home: docs/index.md
-  - Architecture: docs/architecture.md
-  - Changelog: docs/changelog.md
+  - Home: index.md
+  - Architecture: architecture.md
+  - Changelog: changelog.md
