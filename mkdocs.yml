@@ -19,7 +19,6 @@ plugins:
   - search
   - git-revision-date-localized:
       fallback_to_build_date: true
-# NOTE: do NOT list "mike" here; Material reads versions via extra.version.provider
 
 markdown_extensions:
   - admonition
