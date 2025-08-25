@@ -53,7 +53,7 @@ jobs:
             "required_linear_history": true,
             "allow_force_pushes": false,
             "allow_deletions": false,
-            "required_conversation_resolution": { "enabled": true }
+            "required_conversation_resolution": true
           }
           JSON
           gh api -X POST "repos/$OWNER/$REPO/branches/$MAIN/protection/required_signatures" -H "$HDR" >/dev/null || true
@@ -68,8 +68,8 @@ jobs:
             "required_linear_history": true,
             "allow_force_pushes": false,
             "allow_deletions": false,
-            "required_conversation_resolution": { "enabled": true },
-            "lock_branch": { "enabled": true }
+            "required_conversation_resolution": true,
+            "lock_branch": true
           }
           JSON
           gh api -X POST "repos/$OWNER/$REPO/branches/$LEG/protection/required_signatures" -H "$HDR" >/dev/null || true
@@ -86,7 +86,7 @@ jobs:
               "required_linear_history": true,
               "allow_force_pushes": false,
               "allow_deletions": false,
-              "required_conversation_resolution": { "enabled": true }
+              "required_conversation_resolution": true
             }
             JSON
             gh api -X POST "repos/$OWNER/$REPO/branches/$LEG/protection/required_signatures" -H "$HDR" >/dev/null || true
