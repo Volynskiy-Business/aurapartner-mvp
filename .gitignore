@@ -14,3 +14,13 @@ site/
 node_modules/
 dist/
 build/
+.venv/
+.mike/
+site/
+node_modules/
+dist/
+build/
+*.pyc
+__pycache__/
+.DS_Store
+.env
