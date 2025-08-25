@@ -2,7 +2,7 @@ name: Deploy privacy-policy to VPS
 
 on:
   push:
-    branches: [ main ]
+    branches: [main-clean]
     paths:
       - 'privacy-policy/**'
       - '.github/workflows/deploy-privacy-policy.yml'
