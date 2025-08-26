@@ -16,11 +16,11 @@ concurrency:
 
 jobs:
   enforce:
-    # выполнять только для main-clean либо когда запущено вручную
-    if: github.ref == 'refs/heads/main-clean' || github.event_name == 'workflow_dispatch'
+    if: ${{ github.ref == 'refs/heads/main-clean' || github.event_name == 'workflow_dispatch' }}
     runs-on: ubuntu-latest
     env:
       GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      HDR: "Accept: application/vnd.github+json"
 
     steps:
       - name: Context
@@ -34,12 +34,10 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          HDR="Accept: application/vnd.github+json"
           OWNER="${GITHUB_REPOSITORY%/*}"
           REPO="${GITHUB_REPOSITORY#*/}"
           BR="main-clean"
 
-          # Обновляем защиту ветки
           gh api -X PUT -H "$HDR" repos/$OWNER/$REPO/branches/$BR/protection --input - <<'JSON'
           {
             "required_status_checks": {
@@ -63,15 +61,13 @@ jobs:
           }
           JSON
 
-          # Включаем требование подписанных коммитов (идемпотентно)
+          # Идемпотентно потребуем подписанные коммиты
           gh api -X POST -H "$HDR" repos/$OWNER/$REPO/branches/$BR/protection/required_signatures || true
 
       - name: Freeze main-legacy (read-only-ish)
         shell: bash
-        continue-on-error: true
         run: |
           set -euo pipefail
-          HDR="Accept: application/vnd.github+json"
           OWNER="${GITHUB_REPOSITORY%/*}"
           REPO="${GITHUB_REPOSITORY#*/}"
           BR="main-legacy"
@@ -86,13 +82,13 @@ jobs:
             "allow_deletions": false
           }
           JSON
+
       - name: Summarize protections (job summary)
-        if: github.ref_name == 'main-clean'
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         shell: bash
         run: |
           set -euo pipefail
+          OWNER="${GITHUB_REPOSITORY%/*}"
+          REPO="${GITHUB_REPOSITORY#*/}"
 
           row () {
             local BR="$1"
@@ -106,7 +102,7 @@ jobs:
                      ((.enforce_admins.enabled // false)|tostring),
                      ((.allow_force_pushes.enabled // false)|tostring),
                      ((.allow_deletions.enabled // false)|tostring)] | @tsv" \
-            || echo -e "${BR}\t-\t0\tfalse\tfalse\tfalse\tfalse\tfalse"
+            || echo -e "${BR}\t-\t0\tfalse\tfalse\tfalse\tfalse\tfalse\tfalse"
           }
 
           {
