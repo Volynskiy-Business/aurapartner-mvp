@@ -16,11 +16,10 @@ concurrency:
 
 jobs:
   enforce:
-    # запускать только на main-clean либо вручную
+    # Run only on main-clean pushes or manual dispatch
     if: github.ref == 'refs/heads/main-clean' || github.event_name == 'workflow_dispatch'
     runs-on: ubuntu-latest
     env:
-      # ВАЖНО: должен быть задан секрет GH_PAT_ADMIN (classic PAT с правами как минимум repo).
       GH_PAT_ADMIN: ${{ secrets.GH_PAT_ADMIN }}
       ACCEPT: application/vnd.github+json
       APIV: 2022-11-28
@@ -47,11 +46,11 @@ jobs:
         run: |
           set -euo pipefail
           curl -sSf \
-            -H "Authorization: Bearer $GH_PAT_ADMIN" \
+            -H "Authorization: Bearer ${GH_PAT_ADMIN}" \
             -H "Accept: $ACCEPT" \
             https://api.github.com/user | jq '{login, id, type}'
 
-      - name: Protect main-clean (checks, reviews, signatures, linear)
+      - name: Protect main-clean (solo-friendly)
         shell: bash
         run: |
           set -euo pipefail
@@ -59,9 +58,9 @@ jobs:
           REPO="${GITHUB_REPOSITORY#*/}"
           BR="main-clean"
 
-          # Основные правила защиты
+          # Core protection rules (reviews=0 for solo)
           curl -sSf -X PUT \
-            -H "Authorization: Bearer $GH_PAT_ADMIN" \
+            -H "Authorization: Bearer ${GH_PAT_ADMIN}" \
             -H "Accept: $ACCEPT" \
             -H "X-GitHub-Api-Version: ${APIV}" \
             "https://api.github.com/repos/${OWNER}/${REPO}/branches/${BR}/protection" \
@@ -76,7 +75,7 @@ jobs:
             },
             "enforce_admins": true,
             "required_pull_request_reviews": {
-              "required_approving_review_count": 1,
+              "required_approving_review_count": 0,
               "dismiss_stale_reviews": true,
               "require_code_owner_reviews": false
             },
@@ -88,13 +87,12 @@ jobs:
           }
           JSON
 
-          # Идемпотентно требуем подписанные коммиты
+          # Ensure signed commits are required (idempotent)
           curl -sS -o /dev/null -w "required_signatures: HTTP %{http_code}\n" -X POST \
-            -H "Authorization: Bearer $GH_PAT_ADMIN" \
+            -H "Authorization: Bearer ${GH_PAT_ADMIN}" \
             -H "Accept: $ACCEPT" \
             -H "X-GitHub-Api-Version: ${APIV}" \
-            "https://api.github.com/repos/${OWNER}/${REPO}/branches/${BR}/protection/required_signatures" \
-            || true
+            "https://api.github.com/repos/${OWNER}/${REPO}/branches/${BR}/protection/required_signatures" || true
 
       - name: Freeze main-legacy (read-only-ish)
         shell: bash
@@ -104,7 +102,7 @@ jobs:
           REPO="${GITHUB_REPOSITORY#*/}"
 
           curl -sSf -X PUT \
-            -H "Authorization: Bearer $GH_PAT_ADMIN" \
+            -H "Authorization: Bearer ${GH_PAT_ADMIN}" \
             -H "Accept: $ACCEPT" \
             -H "X-GitHub-Api-Version: ${APIV}" \
             "https://api.github.com/repos/${OWNER}/${REPO}/branches/main-legacy/protection" \
@@ -115,7 +113,9 @@ jobs:
             "required_pull_request_reviews": null,
             "restrictions": null,
             "allow_force_pushes": false,
-            "allow_deletions": false
+            "allow_deletions": false,
+            "required_linear_history": true,
+            "required_conversation_resolution": true
           }
           JSON
 
@@ -129,19 +129,19 @@ jobs:
           row () {
             local BR="$1"
             curl -sSf \
-              -H "Authorization: Bearer $GH_PAT_ADMIN" \
+              -H "Authorization: Bearer ${GH_PAT_ADMIN}" \
               -H "Accept: $ACCEPT" \
               -H "X-GitHub-Api-Version: ${APIV}" \
               "https://api.github.com/repos/${OWNER}/${REPO}/branches/${BR}/protection" \
             | jq -r "[\"${BR}\",
-                     ((.required_status_checks.checks | map(.context) | join(\", \")) // \"-\"),
-                     ((.required_pull_request_reviews.required_approving_review_count // 0)|tostring),
-                     ((.required_signatures.enabled // false)|tostring),
-                     ((.required_linear_history.enabled // false)|tostring),
-                     ((.required_conversation_resolution.enabled // false)|tostring),
-                     ((.enforce_admins.enabled // false)|tostring),
-                     ((.allow_force_pushes.enabled // false)|tostring),
-                     ((.allow_deletions.enabled // false)|tostring)] | @tsv" \
+                     (((.required_status_checks?.checks // []) | map(.context) | join(\", \")) // \"-\"),
+                     ((.required_pull_request_reviews?.required_approving_review_count // 0)|tostring),
+                     ((.required_signatures?.enabled // false)|tostring),
+                     ((.required_linear_history?.enabled // false)|tostring),
+                     ((.required_conversation_resolution?.enabled // false)|tostring),
+                     ((.enforce_admins?.enabled // false)|tostring),
+                     ((.allow_force_pushes?.enabled // false)|tostring),
+                     ((.allow_deletions?.enabled // false)|tostring)] | @tsv" \
             || echo -e "${BR}\t-\t0\tfalse\tfalse\tfalse\tfalse\tfalse\tfalse"
           }
 
