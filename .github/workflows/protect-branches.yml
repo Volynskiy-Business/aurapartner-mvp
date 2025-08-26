@@ -2,94 +2,95 @@ name: Protect branches
 
 on:
   push:
-    branches: [main-clean]
+    branches: [ main-clean ]
   workflow_dispatch:
-  schedule:
-    - cron: '17 3 * * *'  # ежедневная самопроверка (UTC)
 
 permissions:
   contents: read
-  pull-requests: read
-  actions: read
   administration: write
-
-concurrency:
-  group: protect-branches
-  cancel-in-progress: false
+  pull-requests: write
 
 jobs:
-  protect:
-    if: github.ref == 'refs/heads/main-clean' || github.event_name != 'push'
+  enforce:
     runs-on: ubuntu-latest
     steps:
-      - name: Apply branch protections
-        env:
-          OWNER: ${{ github.repository_owner }}
-          REPO: ${{ github.event.repository.name }}
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          MAIN: main-clean
-          LEG: main-legacy
+      - name: Set headers
         run: |
-          set -euo pipefail
-          HDR='Accept: application/vnd.github+json'
+          echo "HDR=Accept: application/vnd.github+json" >> $GITHUB_ENV
+          echo "APIV=X-GitHub-Api-Version: 2022-11-28"   >> $GITHUB_ENV
+          echo "OWNER=${{ github.repository_owner }}"     >> $GITHUB_ENV
+          echo "REPO=${{ github.event.repository.name }}" >> $GITHUB_ENV
+          echo "BASE=${{ github.event.repository.default_branch }}" >> $GITHUB_ENV
 
-          echo "🔐 Apply protections for $MAIN"
-          gh api -X PUT "repos/$OWNER/$REPO/branches/$MAIN/protection" -H "$HDR" --input - <<'JSON'
+      - name: Find existing ruleset
+        id: find
+        run: |
+          RID=$(gh api -H "$HDR" -H "$APIV" repos/$OWNER/$REPO/rulesets \
+                --jq '.[] | select(.enforcement=="active")
+                           | select((.conditions.ref_name.include // []) | index("~DEFAULT_BRANCH")
+                                 or (.conditions.ref_name.include // []) | index("main-clean")) | .id' \
+                | head -n1 || true)
+          echo "rid=$RID" >> $GITHUB_OUTPUT
+
+      - name: Upsert ruleset (default + main-clean)
+        run: |
+          RID="${{ steps.find.outputs.rid }}"
+          cat > ruleset.json <<'JSON'
           {
-            "required_status_checks": {
-              "strict": true,
-              "checks": [
-                {"context":"precommit"},
-                {"context":"build-and-test"}
-              ]
-            },
-            "enforce_admins": true,
-            "required_pull_request_reviews": {
-              "required_approving_review_count": 1,
-              "dismiss_stale_reviews": true,
-              "require_code_owner_reviews": false
-            },
-            "restrictions": null,
-            "required_linear_history": true,
-            "allow_force_pushes": false,
-            "allow_deletions": false,
-            "required_conversation_resolution": true
+            "name": "protect: default branch",
+            "enforcement": "active",
+            "target": "branch",
+            "conditions": { "ref_name": { "include": ["~DEFAULT_BRANCH","main-clean"], "exclude": [] } },
+            "bypass_actors": [
+              { "actor_id": 41898282, "actor_type": "Integration", "bypass_mode": "pull_request" }
+            ],
+            "rules": [
+              {
+                "type": "required_status_checks",
+                "parameters": {
+                  "strict_required_status_checks": true,
+                  "do_not_enforce_on_create": false,
+                  "required_status_checks": [
+                    {"context":"precommit"},
+                    {"context":"build-and-test"}
+                  ]
+                }
+              },
+              {
+                "type": "pull_request",
+                "parameters": {
+                  "dismiss_stale_reviews": true,
+                  "require_code_owner_review": false,
+                  "required_approving_review_count": 1,
+                  "required_review_thread_resolution": true
+                }
+              },
+              { "type": "required_linear_history" },
+              { "type": "non_fast_forward" }
+            ]
           }
           JSON
-          gh api -X POST "repos/$OWNER/$REPO/branches/$MAIN/protection/required_signatures" -H "$HDR" >/dev/null || true
+          if [ -n "$RID" ]; then
+            gh api -X PUT -H "$HDR" -H "$APIV" repos/$OWNER/$REPO/rulesets/$RID --input ruleset.json
+          else
+            gh api -X POST -H "$HDR" -H "$APIV" repos/$OWNER/$REPO/rulesets     --input ruleset.json
+          fi
 
-          echo "🧊 Try lock $LEG"
-          gh api -X PUT "repos/$OWNER/$REPO/branches/$LEG/protection" -H "$HDR" --input - <<'JSON'
+      - name: Require signed commits (branch protection)
+        run: |
+          gh api -X POST -H "$HDR" repos/$OWNER/$REPO/branches/$BASE/protection/required_signatures || true
+
+      - name: Lock main-legacy
+        run: |
+          LEG=main-legacy
+          gh api -X PUT -H "$HDR" repos/$OWNER/$REPO/branches/$LEG/protection --input - <<'JSON' || true
           {
             "required_status_checks": null,
             "enforce_admins": true,
             "required_pull_request_reviews": null,
             "restrictions": null,
-            "required_linear_history": true,
             "allow_force_pushes": false,
             "allow_deletions": false,
-            "required_conversation_resolution": true,
-            "lock_branch": true
+            "lock_branch": { "enabled": true }
           }
           JSON
-          gh api -X POST "repos/$OWNER/$REPO/branches/$LEG/protection/required_signatures" -H "$HDR" >/dev/null || true
-
-          LOCK=$(gh api "repos/$OWNER/$REPO/branches/$LEG/protection" -H "$HDR" --jq '.lock_branch.enabled' || echo false)
-          if [ "$LOCK" != "true" ]; then
-            echo "⚠️ lock_branch недоступен — fallback"
-            gh api -X PUT "repos/$OWNER/$REPO/branches/$LEG/protection" -H "$HDR" --input - <<'JSON'
-            {
-              "required_status_checks": { "strict": true, "checks": [ {"context":"lock-branch-sentinel"} ] },
-              "enforce_admins": true,
-              "required_pull_request_reviews": { "required_approving_review_count": 999 },
-              "restrictions": null,
-              "required_linear_history": true,
-              "allow_force_pushes": false,
-              "allow_deletions": false,
-              "required_conversation_resolution": true
-            }
-            JSON
-            gh api -X POST "repos/$OWNER/$REPO/branches/$LEG/protection/required_signatures" -H "$HDR" >/dev/null || true
-          fi
-
-          echo "✅ Branch protections updated" >> "$GITHUB_STEP_SUMMARY"
