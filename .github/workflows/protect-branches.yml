@@ -2,12 +2,12 @@ name: Protect branches
 
 on:
   push:
-    branches: [ main-clean ]
+    branches:
+      - main-clean
   workflow_dispatch:
 
 permissions:
   contents: read
-  administration: write
   pull-requests: write
 
 concurrency:
@@ -16,11 +16,13 @@ concurrency:
 
 jobs:
   enforce:
-    if: ${{ github.ref == 'refs/heads/main-clean' || github.event_name == 'workflow_dispatch' }}
+    # только для main-clean либо при ручном запуске
+    if: github.ref == 'refs/heads/main-clean' || github.event_name == 'workflow_dispatch'
     runs-on: ubuntu-latest
     env:
       GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       HDR: "Accept: application/vnd.github+json"
+      APIV: "X-GitHub-Api-Version: 2022-11-28"
 
     steps:
       - name: Context
@@ -38,7 +40,7 @@ jobs:
           REPO="${GITHUB_REPOSITORY#*/}"
           BR="main-clean"
 
-          gh api -X PUT -H "$HDR" repos/$OWNER/$REPO/branches/$BR/protection --input - <<'JSON'
+          gh api -X PUT -H "$HDR" -H "$APIV" repos/$OWNER/$REPO/branches/$BR/protection --input - <<'JSON'
           {
             "required_status_checks": {
               "strict": true,
@@ -61,8 +63,8 @@ jobs:
           }
           JSON
 
-          # Идемпотентно потребуем подписанные коммиты
-          gh api -X POST -H "$HDR" repos/$OWNER/$REPO/branches/$BR/protection/required_signatures || true
+          # Идемпотентно требуем подписанные коммиты
+          gh api -X POST -H "$HDR" -H "$APIV" repos/$OWNER/$REPO/branches/$BR/protection/required_signatures || true
 
       - name: Freeze main-legacy (read-only-ish)
         shell: bash
@@ -70,9 +72,8 @@ jobs:
           set -euo pipefail
           OWNER="${GITHUB_REPOSITORY%/*}"
           REPO="${GITHUB_REPOSITORY#*/}"
-          BR="main-legacy"
 
-          gh api -X PUT -H "$HDR" repos/$OWNER/$REPO/branches/$BR/protection --input - <<'JSON'
+          gh api -X PUT -H "$HDR" -H "$APIV" repos/$OWNER/$REPO/branches/main-legacy/protection --input - <<'JSON'
           {
             "required_status_checks": null,
             "enforce_admins": true,
@@ -92,7 +93,7 @@ jobs:
 
           row () {
             local BR="$1"
-            gh api -H "$HDR" repos/$OWNER/$REPO/branches/$BR/protection \
+            gh api -H "$HDR" -H "$APIV" repos/$OWNER/$REPO/branches/$BR/protection \
               --jq "[\"${BR}\",
                      ((.required_status_checks.checks | map(.context) | join(\", \")) // \"-\"),
                      ((.required_pull_request_reviews.required_approving_review_count // 0)|tostring),
@@ -119,8 +120,8 @@ jobs:
           } >> "$GITHUB_STEP_SUMMARY"
 
           echo "::group::Raw JSON (main-clean)"
-          gh api -H "$HDR" repos/$OWNER/$REPO/branches/main-clean/protection || true
+          gh api -H "$HDR" -H "$APIV" repos/$OWNER/$REPO/branches/main-clean/protection || true
           echo "::endgroup::"
           echo "::group::Raw JSON (main-legacy)"
-          gh api -H "$HDR" repos/$OWNER/$REPO/branches/main-legacy/protection || true
+          gh api -H "$HDR" -H "$APIV" repos/$OWNER/$REPO/branches/main-legacy/protection || true
           echo "::endgroup::"
