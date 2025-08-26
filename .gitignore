@@ -9,6 +9,23 @@
 *.der
 *.pfx
 .venv/
+<<<<<<< HEAD
+site/
+.mike/
+node_modules/
+dist/
+build/
+docs.backup/
+*.bak
+.venv/
+site/
+.mike/
+node_modules/
+dist/
+build/
+docs.backup/
+*.bak
+=======
 .mike/
 site/
 node_modules/
@@ -24,3 +41,4 @@ build/
 __pycache__/
 .DS_Store
 .env
+>>>>>>> origin/main-clean
