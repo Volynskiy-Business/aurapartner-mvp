@@ -20,7 +20,7 @@ jobs:
     if: github.ref == 'refs/heads/main-clean' || github.event_name == 'workflow_dispatch'
     runs-on: ubuntu-latest
     env:
-      # ВАЖНО: в секретах репозитория должен быть GH_PAT_ADMIN (classic PAT как минимум с repo).
+      # Должен быть секрет GH_PAT_ADMIN (classic PAT минимум с правами repo)
       GH_PAT_ADMIN: ${{ secrets.GH_PAT_ADMIN }}
       ACCEPT: application/vnd.github+json
       APIV: 2022-11-28
@@ -128,14 +128,14 @@ jobs:
 
           row () {
             local BR="$1"
-            # null-safe jq: если checks = null -> []
+            # null-safe: поддерживает и .checks (объекты с context), и .contexts (строки)
             curl -sSf \
               -H "Authorization: Bearer $GH_PAT_ADMIN" \
               -H "Accept: $ACCEPT" \
               -H "X-GitHub-Api-Version: ${APIV}" \
               "https://api.github.com/repos/${OWNER}/${REPO}/branches/${BR}/protection" \
             | jq -r "[\"${BR}\",
-                     (((.required_status_checks.checks // []) | map(.context // .)) | join(\", \")),
+                     ((.required_status_checks.checks // .required_status_checks.contexts // []) | map(.context // .) | join(\", \")),
                      ((.required_pull_request_reviews.required_approving_review_count // 0)|tostring),
                      ((.required_signatures.enabled // false)|tostring),
                      ((.required_linear_history.enabled // false)|tostring),
