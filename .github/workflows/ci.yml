@@ -1,9 +1,12 @@
 name: CI
+
 on:
-  push:
-    branches: [ main ]
   pull_request:
-    branches: [ main ]
+    branches: [main-clean]
+  push:
+    branches: [main-clean]
+  workflow_dispatch:
+
 jobs:
   precommit:
     runs-on: ubuntu-latest
@@ -11,11 +14,25 @@ jobs:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
         with:
-          python-version: '3.x'
-      - run: pip install --upgrade pip pre-commit
+          python-version: '3.12'
+      - run: pipx install pre-commit
       - run: pre-commit run --all-files
+
   build-and-test:
+    needs: precommit
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - run: echo "Build and test placeholder"
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install MkDocs deps
+        run: |
+          python -m pip install --upgrade pip
+          if [ -f requirements-mkdocs.txt ]; then
+            pip install -r requirements-mkdocs.txt
+          else
+            pip install "mkdocs>=1.6" "mkdocs-material>=9.5" mike "mkdocs-git-revision-date-localized-plugin>=1.2"
+          fi
+      - name: Build docs
+        run: mkdocs build --strict
