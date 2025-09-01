@@ -1,0 +1,75 @@
+ ⨯ MissingStaticPage [Error]: Failed to load static file for page: /404 ENOENT: no such file or directory, open '/opt/aurapartnerai/frontend/.next/server/pages/404.html'
+    at /opt/aurapartnerai/frontend/node_modules/next/dist/server/require.js:102:19
+    at async loadComponentsImpl (/opt/aurapartnerai/frontend/node_modules/next/dist/server/load-components.js:103:26)
+    at async NextNodeServer.findPageComponentsImpl (/opt/aurapartnerai/frontend/node_modules/next/dist/server/next-server.js:714:36)
+    at async NextNodeServer.renderErrorToResponseImpl (/opt/aurapartnerai/frontend/node_modules/next/dist/server/base-server.js:2101:30)
+    at async pipe.req.req (/opt/aurapartnerai/frontend/node_modules/next/dist/server/base-server.js:2056:30)
+    at async NextNodeServer.pipeImpl (/opt/aurapartnerai/frontend/node_modules/next/dist/server/base-server.js:922:25)
+    at async invokeRender (/opt/aurapartnerai/frontend/node_modules/next/dist/server/lib/router-server.js:179:21)
+    at async handleRequest (/opt/aurapartnerai/frontend/node_modules/next/dist/server/lib/router-server.js:378:13)
+    at async requestHandlerImpl (/opt/aurapartnerai/frontend/node_modules/next/dist/server/lib/router-server.js:383:13)
+    at async Server.requestListener (/opt/aurapartnerai/frontend/node_modules/next/dist/server/lib/start-server.js:141:13)
+Error: Could not find a production build in the '.next' directory. Try building your app with 'next build' before starting the production server. https://nextjs.org/docs/messages/production-start-no-build-id
+    at setupFsCheck (/opt/aurapartnerai/frontend/node_modules/next/dist/server/lib/router-utils/filesystem.js:151:19)
+    at async initialize (/opt/aurapartnerai/frontend/node_modules/next/dist/server/lib/router-server.js:64:23)
+    at async Server.<anonymous> (/opt/aurapartnerai/frontend/node_modules/next/dist/server/lib/start-server.js:249:36)
+Error: Could not find a production build in the '.next' directory. Try building your app with 'next build' before starting the production server. https://nextjs.org/docs/messages/production-start-no-build-id
+    at setupFsCheck (/opt/aurapartnerai/frontend/node_modules/next/dist/server/lib/router-utils/filesystem.js:151:19)
+    at async initialize (/opt/aurapartnerai/frontend/node_modules/next/dist/server/lib/router-server.js:64:23)
+    at async Server.<anonymous> (/opt/aurapartnerai/frontend/node_modules/next/dist/server/lib/start-server.js:249:36)
+Error: Could not find a production build in the '.next' directory. Try building your app with 'next build' before starting the production server. https://nextjs.org/docs/messages/production-start-no-build-id
+    at setupFsCheck (/opt/aurapartnerai/frontend/node_modules/next/dist/server/lib/router-utils/filesystem.js:151:19)
+    at async initialize (/opt/aurapartnerai/frontend/node_modules/next/dist/server/lib/router-server.js:64:23)
+    at async Server.<anonymous> (/opt/aurapartnerai/frontend/node_modules/next/dist/server/lib/start-server.js:249:36)
+Error: Could not find a production build in the '.next' directory. Try building your app with 'next build' before starting the production server. https://nextjs.org/docs/messages/production-start-no-build-id
+    at setupFsCheck (/opt/aurapartnerai/frontend/node_modules/next/dist/server/lib/router-utils/filesystem.js:151:19)
+    at async initialize (/opt/aurapartnerai/frontend/node_modules/next/dist/server/lib/router-server.js:64:23)
+    at async Server.<anonymous> (/opt/aurapartnerai/frontend/node_modules/next/dist/server/lib/start-server.js:249:36)
+Error: Could not find a production build in the '.next' directory. Try building your app with 'next build' before starting the production server. https://nextjs.org/docs/messages/production-start-no-build-id
+    at setupFsCheck (/opt/aurapartnerai/frontend/node_modules/next/dist/server/lib/router-utils/filesystem.js:151:19)
+    at async initialize (/opt/aurapartnerai/frontend/node_modules/next/dist/server/lib/router-server.js:64:23)
+    at async Server.<anonymous> (/opt/aurapartnerai/frontend/node_modules/next/dist/server/lib/start-server.js:249:36)
+Error: Could not find a production build in the '.next' directory. Try building your app with 'next build' before starting the production server. https://nextjs.org/docs/messages/production-start-no-build-id
+    at setupFsCheck (/opt/aurapartnerai/frontend/node_modules/next/dist/server/lib/router-utils/filesystem.js:151:19)
+    at async initialize (/opt/aurapartnerai/frontend/node_modules/next/dist/server/lib/router-server.js:64:23)
+    at async Server.<anonymous> (/opt/aurapartnerai/frontend/node_modules/next/dist/server/lib/start-server.js:249:36)
+Error: Could not find a production build in the '.next' directory. Try building your app with 'next build' before starting the production server. https://nextjs.org/docs/messages/production-start-no-build-id
+    at setupFsCheck (/opt/aurapartnerai/frontend/node_modules/next/dist/server/lib/router-utils/filesystem.js:151:19)
+    at async initialize (/opt/aurapartnerai/frontend/node_modules/next/dist/server/lib/router-server.js:64:23)
+    at async Server.<anonymous> (/opt/aurapartnerai/frontend/node_modules/next/dist/server/lib/start-server.js:249:36)
+Error: Could not find a production build in the '.next' directory. Try building your app with 'next build' before starting the production server. https://nextjs.org/docs/messages/production-start-no-build-id
+    at setupFsCheck (/opt/aurapartnerai/frontend/node_modules/next/dist/server/lib/router-utils/filesystem.js:151:19)
+    at async initialize (/opt/aurapartnerai/frontend/node_modules/next/dist/server/lib/router-server.js:64:23)
+    at async Server.<anonymous> (/opt/aurapartnerai/frontend/node_modules/next/dist/server/lib/start-server.js:249:36)
+Error: Could not find a production build in the '.next' directory. Try building your app with 'next build' before starting the production server. https://nextjs.org/docs/messages/production-start-no-build-id
+    at setupFsCheck (/opt/aurapartnerai/frontend/node_modules/next/dist/server/lib/router-utils/filesystem.js:151:19)
+    at async initialize (/opt/aurapartnerai/frontend/node_modules/next/dist/server/lib/router-server.js:64:23)
+    at async Server.<anonymous> (/opt/aurapartnerai/frontend/node_modules/next/dist/server/lib/start-server.js:249:36)
+Error: Could not find a production build in the '.next' directory. Try building your app with 'next build' before starting the production server. https://nextjs.org/docs/messages/production-start-no-build-id
+    at setupFsCheck (/opt/aurapartnerai/frontend/node_modules/next/dist/server/lib/router-utils/filesystem.js:151:19)
+    at async initialize (/opt/aurapartnerai/frontend/node_modules/next/dist/server/lib/router-server.js:64:23)
+    at async Server.<anonymous> (/opt/aurapartnerai/frontend/node_modules/next/dist/server/lib/start-server.js:249:36)
+Error: Could not find a production build in the '.next' directory. Try building your app with 'next build' before starting the production server. https://nextjs.org/docs/messages/production-start-no-build-id
+    at setupFsCheck (/opt/aurapartnerai/frontend/node_modules/next/dist/server/lib/router-utils/filesystem.js:151:19)
+    at async initialize (/opt/aurapartnerai/frontend/node_modules/next/dist/server/lib/router-server.js:64:23)
+    at async Server.<anonymous> (/opt/aurapartnerai/frontend/node_modules/next/dist/server/lib/start-server.js:249:36)
+Error: Could not find a production build in the '.next' directory. Try building your app with 'next build' before starting the production server. https://nextjs.org/docs/messages/production-start-no-build-id
+    at setupFsCheck (/opt/aurapartnerai/frontend/node_modules/next/dist/server/lib/router-utils/filesystem.js:151:19)
+    at async initialize (/opt/aurapartnerai/frontend/node_modules/next/dist/server/lib/router-server.js:64:23)
+    at async Server.<anonymous> (/opt/aurapartnerai/frontend/node_modules/next/dist/server/lib/start-server.js:249:36)
+Error: Could not find a production build in the '.next' directory. Try building your app with 'next build' before starting the production server. https://nextjs.org/docs/messages/production-start-no-build-id
+    at setupFsCheck (/opt/aurapartnerai/frontend/node_modules/next/dist/server/lib/router-utils/filesystem.js:151:19)
+    at async initialize (/opt/aurapartnerai/frontend/node_modules/next/dist/server/lib/router-server.js:64:23)
+    at async Server.<anonymous> (/opt/aurapartnerai/frontend/node_modules/next/dist/server/lib/start-server.js:249:36)
+Error: Could not find a production build in the '.next' directory. Try building your app with 'next build' before starting the production server. https://nextjs.org/docs/messages/production-start-no-build-id
+    at setupFsCheck (/opt/aurapartnerai/frontend/node_modules/next/dist/server/lib/router-utils/filesystem.js:151:19)
+    at async initialize (/opt/aurapartnerai/frontend/node_modules/next/dist/server/lib/router-server.js:64:23)
+    at async Server.<anonymous> (/opt/aurapartnerai/frontend/node_modules/next/dist/server/lib/start-server.js:249:36)
+Error: Could not find a production build in the '.next' directory. Try building your app with 'next build' before starting the production server. https://nextjs.org/docs/messages/production-start-no-build-id
+    at setupFsCheck (/opt/aurapartnerai/frontend/node_modules/next/dist/server/lib/router-utils/filesystem.js:151:19)
+    at async initialize (/opt/aurapartnerai/frontend/node_modules/next/dist/server/lib/router-server.js:64:23)
+    at async Server.<anonymous> (/opt/aurapartnerai/frontend/node_modules/next/dist/server/lib/start-server.js:249:36)
+Error: Could not find a production build in the '.next' directory. Try building your app with 'next build' before starting the production server. https://nextjs.org/docs/messages/production-start-no-build-id
+    at setupFsCheck (/opt/aurapartnerai/frontend/node_modules/next/dist/server/lib/router-utils/filesystem.js:151:19)
+    at async initialize (/opt/aurapartnerai/frontend/node_modules/next/dist/server/lib/router-server.js:64:23)
+    at async Server.<anonymous> (/opt/aurapartnerai/frontend/node_modules/next/dist/server/lib/start-server.js:249:36)

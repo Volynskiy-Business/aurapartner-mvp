@@ -1,0 +1,17 @@
+{
+  "name": "aurapartnerai",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "build": "npm run build:all",
+    "build:all": "npm run build:backend && npm run build:frontend",
+    "build:backend": "cd backend && npm run build",
+    "build:frontend": "cd frontend && npm run build",
+    "migrate:prod": "cd backend && npm run migrate:prod",
+    "setup:qdrant": "cd backend && npm run setup:qdrant"
+  },
+  "devDependencies": {
+    "tsx": "^4.20.5",
+    "typescript": "^5.0.0"
+  }
+}
