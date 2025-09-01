@@ -7,7 +7,7 @@ export const setupHealth = (app: Express) => {
       timestamp: new Date().toISOString(),
       services: {
         qdrant: 'online',
-        mem0: 'online', 
+        mem0: 'online',
         postgres: 'online',
         redis: 'online'
       }

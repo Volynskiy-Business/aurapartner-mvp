@@ -16,7 +16,7 @@ export default function Home() {
 
   const handleSendMessage = async () => {
     if (!message.trim()) return
-    
+
     try {
       const response = await fetch('/api/chat', {
         method: 'POST',
@@ -50,7 +50,7 @@ export default function Home() {
             <span className="text-sm text-gray-600">Qdrant Ready</span>
           </div>
         </div>
-        
+
         <div className="bg-white rounded-lg shadow p-6">
           <h3 className="font-semibold text-gray-900 mb-2">Memory Engine</h3>
           <div className="flex items-center">
@@ -58,7 +58,7 @@ export default function Home() {
             <span className="text-sm text-gray-600">Mem0.ai Online</span>
           </div>
         </div>
-        
+
         <div className="bg-white rounded-lg shadow p-6">
           <h3 className="font-semibold text-gray-900 mb-2">Backend API</h3>
           <div className="flex items-center">
