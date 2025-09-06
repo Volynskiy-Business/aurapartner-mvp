@@ -24,3 +24,58 @@ build/
 __pycache__/
 .DS_Store
 .env
+
+# Backend env
+backend/.env
+
+# --- Monorepo ignores ---
+# Node/Next build outputs & logs
+frontend/.next/
+frontend/logs/
+frontend/node_modules/
+backend/node_modules/
+dist/
+build/
+coverage/
+*.log
+
+# Env files
+*.env
+backend/.env
+frontend/.env
+
+# --- Monorepo ignores (build artifacts, logs, env, vendor) ---
+frontend/.next/
+frontend/logs/
+frontend/node_modules/
+backend/node_modules/
+dist/
+build/
+coverage/
+*.log
+
+# Env files
+*.env
+backend/.env
+frontend/.env
+
+# Qdrant data volumes (never commit DB files)
+qdrant_storage/
+
+# --- Monorepo ignores (build artifacts, logs, env, vendor, DB data) ---
+frontend/.next/
+frontend/logs/
+frontend/node_modules/
+backend/node_modules/
+dist/
+build/
+coverage/
+*.log
+
+# Env files
+*.env
+backend/.env
+frontend/.env
+
+# Qdrant data volumes (never commit DB files)
+qdrant_storage/

@@ -1,0 +1,113 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: aurapartnerai-frontend
+  namespace: aurapartnerai
+  labels:
+    app: aurapartnerai-frontend
+    tier: frontend
+spec:
+  replicas: 3
+  strategy:
+    type: RollingUpdate
+    rollingUpdate: { maxUnavailable: 1, maxSurge: 2 }
+  selector:
+    matchLabels:
+      app: aurapartnerai-frontend
+  template:
+    metadata:
+      labels:
+        app: aurapartnerai-frontend
+        tier: frontend
+    spec:
+      securityContext:
+        fsGroup: 1001
+      volumes:
+        - name: tmp
+          emptyDir: {}
+        - name: nextjs-cache
+          emptyDir: {}
+      containers:
+        - name: frontend
+          image: ghcr.io/volynskiy-business/aurapartner-mvp/frontend:latest
+          ports:
+            - containerPort: 3000
+              name: http
+          env:
+            - name: NODE_ENV
+              value: "production"
+            - name: NEXT_PUBLIC_API_URL
+              valueFrom:
+                configMapKeyRef:
+                  name: frontend-config
+                  key: api-url
+            - name: NEXT_PUBLIC_WS_URL
+              valueFrom:
+                configMapKeyRef:
+                  name: frontend-config
+                  key: ws-url
+          resources:
+            requests: { memory: "256Mi", cpu: "250m" }
+            limits:   { memory: "1Gi",   cpu: "1000m" }
+          securityContext:
+            runAsNonRoot: true
+            runAsUser: 1001
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+          volumeMounts:
+            - { name: tmp,          mountPath: /tmp }
+            - { name: nextjs-cache, mountPath: /app/.next/cache }
+          livenessProbe:
+            httpGet: { path: /api/health, port: 3000 }
+            initialDelaySeconds: 30
+            periodSeconds: 10
+            timeoutSeconds: 5
+            failureThreshold: 3
+          readinessProbe:
+            httpGet: { path: /api/health, port: 3000 }
+            initialDelaySeconds: 5
+            periodSeconds: 5
+            timeoutSeconds: 3
+            failureThreshold: 3
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: aurapartnerai-frontend-service
+  namespace: aurapartnerai
+spec:
+  selector:
+    app: aurapartnerai-frontend
+  ports:
+    - name: http
+      port: 80
+      targetPort: 3000
+      protocol: TCP
+  type: ClusterIP
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: aurapartnerai-frontend-ingress
+  namespace: aurapartnerai
+  annotations:
+    kubernetes.io/ingress.class: nginx
+    cert-manager.io/cluster-issuer: letsencrypt-prod
+    nginx.ingress.kubernetes.io/ssl-redirect: "true"
+    nginx.ingress.kubernetes.io/force-ssl-redirect: "true"
+    nginx.ingress.kubernetes.io/enable-compression: "true"
+    nginx.ingress.kubernetes.io/compression-types: "text/html,text/css,text/plain,text/xml,application/javascript,application/json"
+spec:
+  tls:
+    - hosts: [app.aurapartnerai.com]
+      secretName: frontend-tls
+  rules:
+    - host: app.aurapartnerai.com
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: aurapartnerai-frontend-service
+                port: { number: 80 }

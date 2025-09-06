@@ -1,0 +1,13 @@
+node_modules
+.next/cache
+.next/trace
+.git
+.github
+.gitignore
+coverage
+__tests__/
+tests/
+Dockerfile*
+*.log
+.env*
+venv/
