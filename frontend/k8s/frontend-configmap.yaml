@@ -1,0 +1,8 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: frontend-config
+  namespace: aurapartnerai
+data:
+  api-url: "https://aurapartnerai.com"
+  ws-url:  "wss://aurapartnerai.com/ws"
