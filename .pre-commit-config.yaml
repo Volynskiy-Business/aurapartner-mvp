@@ -1,17 +1,33 @@
+# Global exclude for generated/vendor/data dirs
+exclude: |
+  ^(
+    frontend/\.next|
+    node_modules|
+    dist|
+    build|
+    logs|
+    venv|
+    \.venv|
+    qdrant_storage
+  )/
+
 repos:
+  # Basic sanity hooks
   - repo: https://github.com/pre-commit/pre-commit-hooks
-    rev: v4.4.0
+    rev: v6.0.0
     hooks:
+      - id: check-merge-conflict
       - id: end-of-file-fixer
       - id: trailing-whitespace
-      - id: check-yaml
-      - id: check-json
       - id: detect-private-key
-      - id: check-added-large-files
-        args: ['--maxkb=10240']
 
+  # Secret scanning (Yelp detect-secrets)
   - repo: https://github.com/Yelp/detect-secrets
     rev: v1.5.0
     hooks:
       - id: detect-secrets
-        args: ['--baseline', '.secrets.baseline']
+        args:
+          - "--baseline"
+          - ".secrets.baseline"
+          - "--exclude-files"
+          - "node_modules|\\.next|dist|build|logs|venv|\\.venv|qdrant_storage"

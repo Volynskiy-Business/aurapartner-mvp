@@ -1,8 +1,0 @@
-2025-09-01T14:58:23.838Z: Server running on port 5000
-2025-09-01T14:58:23.839Z: Environment: production
-2025-09-01T15:00:14.011Z: ✅ AuraPartnerAI Backend started on port 5000
-2025-09-01T15:00:14.012Z: Environment: production
-2025-09-01T15:00:14.013Z: Health check: http://localhost:5000/health
-2025-09-01T15:06:31.772Z: ✅ AuraPartnerAI Backend started on port 5000
-2025-09-01T15:06:31.774Z: Environment: production
-2025-09-01T15:06:31.774Z: Health check: http://localhost:5000/health
